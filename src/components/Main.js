@@ -29,6 +29,7 @@ class Main extends Component {
                         ref={(input) => { this.fileDescription = input }}
                         className="shadow appearance-none border rounded py-2 px-3 text-gray-700 leading-tight w-96 focus:outline-none focus:shadow-outline"
                         placeholder="description..."
+                        autoComplete="off"
                         required />
                   </div>
                   <div className="mt-4">
