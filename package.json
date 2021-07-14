@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Decentralized File Storage",
   "author": "github.com/deveshb15",
-  "homepage": ".",
+  "homepage": "http://deveshb15.github.io/ddrop",
   "dependencies": {
     "@craco/craco": "^5.8.0",
     "@truffle/hdwallet-provider": "^1.4.1",
