@@ -7,6 +7,10 @@ import Web3 from 'web3';
 import './App.css';
 import DDrop from '../abis/DDrop.json' 
 
+// Contract address
+const contractAbi = DDrop.abi
+const contractAddress = "0x92b39DF033f0671c57C7FcF5273C7413c35137b5"
+
 //Declare IPFS
 const ipfsClient = require('ipfs-http-client')
 const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol:'https' })
@@ -40,30 +44,21 @@ class App extends Component {
     const accounts = await web3.eth.getAccounts()
     this.setState({ account: accounts[0] })
 
-    //Network ID
-    const networkId = await web3.eth.net.getId()
-    const networkData = DDrop.networks[networkId]
-    //IF got connection, get data from contracts
-    if(networkData){
-      //Assign contract
-      const ddrop = new web3.eth.Contract(DDrop.abi, networkData.address)
-      this.setState({ ddrop })
-      //Get files amount
-      const filesCount = await ddrop.methods.fileCount().call()
-      this.setState({ filesCount })
-      //Load files&sort by the newest
-      for(let i = filesCount; i>=1; i--){
-        const file = await ddrop.methods.files(i).call()
-        this.setState({
-          files: [...this.state.files, file]
-        })
-      }
-    } else {
-      //Else
-      //alert Error
-      window.alert("DDrop contract not deployed to detected network")
+    const ddrop = new web3.eth.Contract(contractAbi, contractAddress)
+    this.setState({ ddrop })
+    console.log(ddrop)
+    //Get files amount
+    const filesCount = await ddrop.methods.fileCount().call()
+    this.setState({ filesCount })
+    //Load files&sort by the newest
+    for(let i = filesCount; i>=1; i--){
+      const file = await ddrop.methods.files(i).call()
+      this.setState({
+        files: [...this.state.files, file]
+      })
     }
-      this.setState({ loading: false })
+
+    this.setState({ loading: false })
   }
 
   // Get file from user
