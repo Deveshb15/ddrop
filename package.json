@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "description": "Decentralized File Storage",
   "author": "github.com/deveshb15",
-  "homepage": "http://deveshb15.github.io/ddrop",
+  "homepage": ".",
   "dependencies": {
     "@craco/craco": "^5.8.0",
     "babel-polyfill": "6.26.0",
