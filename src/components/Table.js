@@ -6,7 +6,6 @@ import moment from "moment";
 
 class Table extends Component {
   render() {
-    console.log(this.props.files);
     return (
       <div className="flex flex-col mx-12 my-8">
         <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
