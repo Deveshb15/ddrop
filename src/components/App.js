@@ -29,7 +29,7 @@ function App() {
   useEffect(() => {
     const load = async () => {
       await loadWeb3()
-      await loadBlockchainData()
+      // await loadBlockchainData()
     }
     load()
   }, [])
@@ -38,7 +38,7 @@ function App() {
     //Setting up Web3
     if(window.ethereum){
       window.web3 = new Web3(window.ethereum)
-      await window.ethereum.enable()
+      // await window.ethereum.enable()
     }
     else if(window.web3) {
       window.web3 = new Web3(window.web3.currentProvider)
@@ -46,28 +46,45 @@ function App() {
     else{
       window.alert("Non-Ethereum browser detected. You should consider trying metamask")
     }
+    const accounts = await window.ethereum.request({method: 'eth_accounts'})
+    if(accounts.length!==0) {
+      const account = accounts[0];
+      console.log("We found an authorized account: ", account)
+      // getTotalNFTsMintedSoFar()
+    } else {
+      console.log("No authorized account found.")
+    }
   }
 
   const loadBlockchainData = async() => {
-    //Declare Web3
-    const web3 = window.web3
+    try {
+      const { ethereum } = window;
+      const web3 = window.web3
+      if(!ethereum) {
+        alert("Get Metamask!")
+        return;
+      } else {
+        const accounts = await ethereum.request({method: 'eth_requestAccounts'})
 
-    //Load account
-    const accounts = await web3.eth.getAccounts()
-    setAccount(accounts[0])
-
-    const ddrop = new web3.eth.Contract(contractAbi, contractAddress)
-    setDdrop(ddrop)
-    console.log(ddrop)
-    //Get files amount
-    const filesCount = await ddrop.methods.fileCount().call()
-    setFilesCount(filesCount)
-    //Load files&sort by the newest
-    for(let i = filesCount; i>=1; i--){
-      const file = await ddrop.methods.files(i).call()
-      setFiles(files => [...files, file])
+        console.log("Connected ", accounts[0])
+        setAccount(accounts[0])
+        const ddrop = new web3.eth.Contract(contractAbi, contractAddress)
+        setDdrop(ddrop)
+        console.log(ddrop)
+        //Get files amount
+        const filesCount = await ddrop.methods.fileCount().call()
+        setFilesCount(filesCount)
+        //Load files&sort by the newest
+        for(let i = filesCount; i>=1; i--){
+          const file = await ddrop.methods.files(i).call()
+          setFiles(files => [...files, file])
+        }
+      }
+      // setUpEventListener()
+      // checkIfConnectedToRinkeby()
+    } catch (error) {
+      console.log(error)
     }
-
     setLoading(false)
   }
 
