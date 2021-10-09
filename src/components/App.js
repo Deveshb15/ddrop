@@ -1,4 +1,4 @@
-import React, { Component } from 'react';
+import React, { useState, useEffect } from 'react';
 import Navbar from './Navbar'
 import Main from './Main'
 import Table from './Table'
@@ -15,14 +15,26 @@ const contractAddress = "0x92b39DF033f0671c57C7FcF5273C7413c35137b5"
 const ipfsClient = require('ipfs-http-client')
 const ipfs = ipfsClient({ host: 'ipfs.infura.io', port: 5001, protocol:'https' })
 
-class App extends Component {
+function App() {
 
-  async componentWillMount() {
-    await this.loadWeb3()
-    await this.loadBlockchainData()
-  }
+    const [loading, setLoading] = useState(false)
+    const [ddrop, setDdrop] = useState(null)
+    const [type, setType] = useState(null)
+    const [name, setName] = useState(null)
+    const [account, setAccount] = useState('')
+    const [files, setFiles] = useState([])
+    const [filesCount, setFilesCount] = useState(0)
+    const [buffer, setBuffer] = useState(null)
 
-  async loadWeb3() {
+  useEffect(() => {
+    const load = async () => {
+      await loadWeb3()
+      await loadBlockchainData()
+    }
+    load()
+  }, [])
+
+  const loadWeb3 = async() => {
     //Setting up Web3
     if(window.ethereum){
       window.web3 = new Web3(window.ethereum)
@@ -36,33 +48,31 @@ class App extends Component {
     }
   }
 
-  async loadBlockchainData() {
+  const loadBlockchainData = async() => {
     //Declare Web3
     const web3 = window.web3
 
     //Load account
     const accounts = await web3.eth.getAccounts()
-    this.setState({ account: accounts[0] })
+    setAccount(accounts[0])
 
     const ddrop = new web3.eth.Contract(contractAbi, contractAddress)
-    this.setState({ ddrop })
+    setDdrop(ddrop)
     console.log(ddrop)
     //Get files amount
     const filesCount = await ddrop.methods.fileCount().call()
-    this.setState({ filesCount })
+    setFilesCount(filesCount)
     //Load files&sort by the newest
     for(let i = filesCount; i>=1; i--){
       const file = await ddrop.methods.files(i).call()
-      this.setState({
-        files: [...this.state.files, file]
-      })
+      setFiles(files => [...files, file])
     }
 
-    this.setState({ loading: false })
+    setLoading(false)
   }
 
   // Get file from user
-  captureFile = event => {
+  const captureFile = (event) => {
     event.preventDefault()
 
     const file = event.target.files[0];
@@ -70,22 +80,20 @@ class App extends Component {
 
     reader.readAsArrayBuffer(file)
     reader.onloadend = () => {
-      this.setState({
-        buffer: Buffer(reader.result),
-        type: file.type,
-        name: file.name
-      })
-      console.log('buffer', this.state.buffer)
+      setBuffer(Buffer(reader.result))
+      setType(file.type)
+      setName(file.name)
+      console.log('buffer', buffer)
     }
   }
 
 
   //Upload File
-  uploadFile = description => {
+  const uploadFile = (description) => {
     console.log("Submitting files to IPFS");
     
     //Add file to the IPFS
-    ipfs.add(this.state.buffer, (error, result) => {
+    ipfs.add(buffer, (error, result) => {
       console.log('IPFS result', result);
       //Check If error
       if(error){
@@ -94,63 +102,42 @@ class App extends Component {
         return
       }
       //Set state to loading
-      this.setState({ loading: true })
+      setLoading(true)
 
       //Assign value for the file without extension
-      if(this.state.type === '') {
-        this.setState({ type: 'none' })
+      if(type === '') {
+        setType('none')
       }
 
       //Call smart contract uploadFile function 
-      this.state.ddrop.methods.uploadFile(result[0].hash, result[0].size, this.state.type, this.state.name, description).send({ from: this.state.account }).on('transactionHash', (hash) => {
-        this.setState({
-          loading: false,
-          type: null,
-          name: null
-        })
-        window.location.reload()
+      ddrop.methods.uploadFile(result[0].hash, result[0].size, type, name, description).send({ from: account }).on('transactionHash', (hash) => {
+        setLoading(false)
+        setType(null)
+        setName(null)
+        // window.location.reload()
       }).on('error', (e) => {
         window.alert('Error uploading file, Please try again')
-        this.setState({ loading: false})
+        setLoading(false)
       })
     })
-
-
   }
 
-  //Set states
-  constructor(props) {
-    super(props)
-    this.state = {
-      loading: false,
-      ddrop: null,
-      type: null,
-      name: null,
-      account: '',
-      files: []
-    }
-
-    //Bind functions
-  }
-
-  render() {
     return (
       <div>
-        <Navbar account={this.state.account} />
-        { this.state.loading
+        <Navbar account={account} connect={loadBlockchainData} />
+        { loading
           ? <div id="loader" className="text-center mt-5"><p>Loading...</p></div>
           : <>
             <Main
-                files={this.state.files}
-                captureFile={this.captureFile}
-                uploadFile={this.uploadFile}
+                files={files}
+                captureFile={captureFile}
+                uploadFile={uploadFile}
               />
-            {(this.state.files.length !== 0) ? <Table files={this.state.files} /> : <span></span>}
+            {(files.length !== 0) ? <Table files={files} /> : <span></span>}
             </>
         }
       </div>
     );
-  }
 }
 
 export default App;

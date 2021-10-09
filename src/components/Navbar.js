@@ -1,10 +1,9 @@
-import React, { Component } from 'react';
+import React from 'react';
 import Identicon from 'identicon.js';
 import logo from '../logo.png'
 
-class Navbar extends Component {
-  
-  render() {
+const Navbar = (props) => {
+
     return (
       <nav className="bg-white relative">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -18,72 +17,34 @@ class Navbar extends Component {
                 <h1 className="font-extrabold text-4xl ml-24 text-transparent bg-clip-text bg-gradient-to-br from-indigo-400 to-green-400">DDrop</h1>
               </div>
               <div className="relative">
-                { this.props.account
+                { props.account
                   ? <div className="flex">
                     <small className="mr-2 mt-2 underline" id="account">
                       <a target="_blank"
                         alt=""
                         className="text-black font-bold"
                         rel="noopener noreferrer"
-                        href={"https://etherscan.io/address/" + this.props.account}>
-                        {this.props.account.substring(0,6)}...{this.props.account.substring(38,42)}
+                        href={"https://etherscan.io/address/" + props.account}>
+                        {props.account.substring(0,6)}...{props.account.substring(38,42)}
                       </a>
                     </small>
                     <img
                       alt=""
                       className='h-8 w-8 '
-                      src={`data:image/png;base64,${new Identicon(this.props.account, 30).toString()}`}
+                      src={`data:image/png;base64,${new Identicon(props.account, 30).toString()}`}
                     />
                   </div>
-                  : <span></span>
+                  : <div className="flex">
+                      <small className="mr-2 mt-2 underline" id="account">
+                        <button type="submit" className="bg-transparent hover:bg-blue-500 text-blue-700 hover:text-white py-2 px-4 border border-blue-500 hover:border-transparent rounded"><b>Connet Wallet</b></button>
+                      </small>
+                    </div>
                 }
               </div>
           </div>
         </div>
       </nav>
     );
-  }
 }
 
 export default Navbar;
-
-
-
-
-
-
-
-
-
-{/* <a
-          className="navbar-brand col-sm-3 col-md-2 mr-0"
-          href="http://www.dappuniversity.com/bootcamp"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src={box} width="30" height="30" className="align-top" alt="" />
-          DDrop
-        </a>
-        <ul className="navbar-nav px-3">
-        <li>
-            <small id="account">
-              <a target="_blank"
-                 alt=""
-                 className="text-white"
-                 rel="noopener noreferrer"
-                 href={"https://etherscan.io/address/" + this.props.account}>
-                {this.props.account.substring(0,6)}...{this.props.account.substring(38,42)}
-              </a>
-            </small>
-            { this.props.account
-              ? <img
-                  alt=""
-                  className='ml-2'
-                  width='30'
-                  height='30'
-                  src={`data:image/png;base64,${new Identicon(this.props.account, 30).toString()}`}
-                />
-              : <span></span>
-            }
-          </li>
-        </ul> */}

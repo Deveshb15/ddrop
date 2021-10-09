@@ -1,11 +1,11 @@
 /* eslint-disable, no-console */
 /* eslint-disable no-lone-blocks, no-console */
-import React, { Component } from "react";
+import React from "react";
 import { convertBytes } from "./helpers";
 import moment from "moment";
 
-class Table extends Component {
-  render() {
+const Table = (props) => {
+
     return (
       <div className="flex flex-col mx-12 my-8">
         <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -64,7 +64,7 @@ class Table extends Component {
                     </th>
                   </tr>
                 </thead>
-                {this.props.files.map((file, key) => (
+                {props.files.map((file, key) => (
                   <tbody
                     className="bg-white divide-y divide-gray-200"
                     key={key}
@@ -127,7 +127,6 @@ class Table extends Component {
         </div>
       </div>
     );
-  }
 }
 
 export default Table;
