@@ -4,6 +4,7 @@ import Main from './Main'
 import Table from './Table'
 
 import Web3 from 'web3';
+import { ethers } from 'ethers';
 import './App.css';
 import DDrop from '../abis/DDrop.json' 
 
@@ -28,31 +29,27 @@ function App() {
 
   useEffect(() => {
     const load = async () => {
-      await loadWeb3()
+      await checkIfWalletIsConnected()
       // await loadBlockchainData()
     }
     load()
   }, [])
 
-  const loadWeb3 = async() => {
-    //Setting up Web3
-    if(window.ethereum){
-      window.web3 = new Web3(window.ethereum)
-      // await window.ethereum.enable()
-    }
-    else if(window.web3) {
-      window.web3 = new Web3(window.web3.currentProvider)
-    }
-    else{
-      window.alert("Non-Ethereum browser detected. You should consider trying metamask")
-    }
-    const accounts = await window.ethereum.request({method: 'eth_accounts'})
-    if(accounts.length!==0) {
-      const account = accounts[0];
-      console.log("We found an authorized account: ", account)
-      // getTotalNFTsMintedSoFar()
+  const checkIfWalletIsConnected = async() => {
+    const {ethereum} = window
+
+    if(!ethereum) {
+      console.log("Download Metamask")
     } else {
-      console.log("No authorized account found.")
+      console.log("We have ethereum object", ethereum)
+    }
+
+    const accounts = await ethereum.request({method: 'eth_accounts'})
+    if(accounts.length!==0) {
+      const account = accounts[0]
+      console.log("We found an authorized account: ",account)
+    } else {
+      console.log("No authorized account found!")
     }
   }
 
