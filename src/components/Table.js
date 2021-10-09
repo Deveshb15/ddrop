@@ -73,7 +73,7 @@ const Table = (props) => {
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
                           <div className="text-sm font-medium text-gray-900">
-                            {file.fileId}
+                            {file.fileId.toNumber()}
                           </div>
                         </div>
                       </td>
@@ -92,11 +92,11 @@ const Table = (props) => {
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
                         <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                          {convertBytes(file.fileSize)}
+                          {convertBytes(file.fileSize.toNumber())}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {moment.unix(file.uploadTime).format("h:mm:ss A M/D/Y")}
+                        {moment.unix(file.uploadTime.toNumber()).format("h:mm:ss A M/D/Y")}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-left text-sm font-medium">
                         <a

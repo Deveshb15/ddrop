@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
+import { WindMillLoading } from 'react-loadingg'
 import Navbar from './Navbar'
 import Main from './Main'
 import Table from './Table'
 
-import Web3 from 'web3';
 import { ethers } from 'ethers';
 import './App.css';
 import DDrop from '../abis/DDrop.json' 
@@ -24,65 +24,69 @@ function App() {
     const [name, setName] = useState(null)
     const [account, setAccount] = useState('')
     const [files, setFiles] = useState([])
-    const [filesCount, setFilesCount] = useState(0)
     const [buffer, setBuffer] = useState(null)
 
   useEffect(() => {
-    const load = async () => {
-      await checkIfWalletIsConnected()
-      // await loadBlockchainData()
-    }
-    load()
-  }, [])
+    checkIfWalletIsConnected()
+  }, []) //eslint-disable-line
 
   const checkIfWalletIsConnected = async() => {
-    const {ethereum} = window
-
+    const { ethereum } = window
     if(!ethereum) {
-      console.log("Download Metamask")
+      console.log("Install metamask")
     } else {
-      console.log("We have ethereum object", ethereum)
+      console.log("We have ethereum obj")
     }
 
     const accounts = await ethereum.request({method: 'eth_accounts'})
     if(accounts.length!==0) {
-      const account = accounts[0]
-      console.log("We found an authorized account: ",account)
+      console.log("We found authorized account: ", accounts[0])
+      // setUpEventListener()
     } else {
-      console.log("No authorized account found!")
+      console.log("No authorized account found.")
     }
   }
 
-  const loadBlockchainData = async() => {
+  const connectWallet = async() => {
     try {
-      const { ethereum } = window;
-      const web3 = window.web3
+      const {ethereum} = window
       if(!ethereum) {
         alert("Get Metamask!")
         return;
       } else {
         const accounts = await ethereum.request({method: 'eth_requestAccounts'})
-
-        console.log("Connected ", accounts[0])
+        console.log("connected: ", accounts[0])
         setAccount(accounts[0])
-        const ddrop = new web3.eth.Contract(contractAbi, contractAddress)
+      }
+      setLoading(true)
+      fetchFiles()
+      setUpEventListener()
+      checkIfConnectedToRinkeby()
+    } catch(e) {
+      console.log(e)
+    }
+  }
+
+  const fetchFiles = async() => {
+    try {
+      const {ethereum} = window
+      if(ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum)
+        const signer = provider.getSigner()
+        const ddrop = new ethers.Contract(contractAddress, contractAbi, signer)
+        // console.log(ddrop)
         setDdrop(ddrop)
-        console.log(ddrop)
-        //Get files amount
-        const filesCount = await ddrop.methods.fileCount().call()
-        setFilesCount(filesCount)
-        //Load files&sort by the newest
-        for(let i = filesCount; i>=1; i--){
-          const file = await ddrop.methods.files(i).call()
+        const fileCount = await ddrop.fileCount()
+        for(let i = fileCount; i>=1; i--){
+          const file = await ddrop.files(i)
           setFiles(files => [...files, file])
         }
+    
+        setLoading(false)
       }
-      // setUpEventListener()
-      // checkIfConnectedToRinkeby()
-    } catch (error) {
-      console.log(error)
+    } catch(e) {
+      console.log(e)
     }
-    setLoading(false)
   }
 
   // Get file from user
@@ -104,6 +108,8 @@ function App() {
 
   //Upload File
   const uploadFile = (description) => {
+    //Set state to loading
+    setLoading(true)
     console.log("Submitting files to IPFS");
     
     //Add file to the IPFS
@@ -115,43 +121,63 @@ function App() {
         //Return error
         return
       }
-      //Set state to loading
-      setLoading(true)
-
       //Assign value for the file without extension
       if(type === '') {
         setType('none')
       }
 
-      //Call smart contract uploadFile function 
-      ddrop.methods.uploadFile(result[0].hash, result[0].size, type, name, description).send({ from: account }).on('transactionHash', (hash) => {
-        setLoading(false)
+      try {
+        ddrop.uploadFile(result[0].hash, result[0].size, type, name, description)
         setType(null)
         setName(null)
-        // window.location.reload()
-      }).on('error', (e) => {
-        window.alert('Error uploading file, Please try again')
+      } catch(e) {
+        window.alert('Error uploading file, Please try connecting your wallet correctly!')
         setLoading(false)
-      })
+      }   
     })
   }
 
-    return (
-      <div>
-        <Navbar account={account} connect={loadBlockchainData} />
-        { loading
-          ? <div id="loader" className="text-center mt-5"><p>Loading...</p></div>
-          : <>
-            <Main
-                files={files}
-                captureFile={captureFile}
-                uploadFile={uploadFile}
-              />
-            {(files.length !== 0) ? <Table files={files} /> : <span></span>}
-            </>
-        }
-      </div>
-    );
+  const setUpEventListener = () => {
+    try {
+      const {ethereum} = window
+      if(ethereum) {
+        const provider = new ethers.providers.Web3Provider(ethereum)
+        const signer = provider.getSigner()
+        const ddrop = new ethers.Contract(contractAddress ,contractAbi, signer)
+
+        ddrop.on("FileUploaded", (fileId, fileHash, fileSize, fileType, fileName, fileDescription, uploadTime, uploader) => {
+          alert(`Hey there! your file has been uploaded and you can take a look at it over here: https://ipfs.infura.io/ipfs/${fileHash}`)
+          setLoading(false)
+        })
+      }
+    } catch(e) {
+      console.log(e)
+      setLoading(false)
+    }
+  }
+
+  const checkIfConnectedToRinkeby = () => {
+    if(window.ethereum.networkVersion !== "4") {
+      alert("Hey — I see you're connected to mainnet but this only works on Rinkeby!")
+    }
+  }
+
+  return (
+    <div>
+      <Navbar account={account} connect={connectWallet} />
+      { loading
+        ? <div id="loader" className="text-center"><WindMillLoading size="large" color="#4F46E5" /></div>
+        : <>
+          <Main
+              files={files}
+              captureFile={captureFile}
+              uploadFile={uploadFile}
+            />
+          {(files.length !== 0) ? <Table files={files} /> : <span></span>}
+          </>
+      }
+    </div>
+  );
 }
 
 export default App;
