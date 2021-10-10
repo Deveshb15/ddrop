@@ -1,12 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { WindMillLoading } from 'react-loadingg'
 import Navbar from './Navbar'
 import Main from './Main'
-import Table from './Table'
-
 import { ethers } from 'ethers';
 import './App.css';
 import DDrop from '../abis/DDrop.json' 
+
+const Table = React.lazy(() => import('./Table'))
 
 // Contract address
 const contractAbi = DDrop.abi
@@ -50,6 +50,7 @@ function App() {
   const connectWallet = async() => {
     try {
       const {ethereum} = window
+      setLoading(true)
       if(!ethereum) {
         alert("Get Metamask!")
         return;
@@ -58,7 +59,7 @@ function App() {
         console.log("connected: ", accounts[0])
         setAccount(accounts[0])
       }
-      setLoading(true)
+      setLoading(false)
       fetchFiles()
       setUpEventListener()
       checkIfConnectedToRinkeby()
@@ -81,8 +82,6 @@ function App() {
           const file = await ddrop.files(i)
           setFiles(files => [...files, file])
         }
-    
-        setLoading(false)
       }
     } catch(e) {
       console.log(e)
@@ -163,7 +162,7 @@ function App() {
   }
 
   return (
-    <div>
+    <div className="dark:bg-light-black">
       <Navbar account={account} connect={connectWallet} />
       { loading
         ? <div id="loader" className="text-center"><WindMillLoading size="large" color="#4F46E5" /></div>
@@ -173,7 +172,11 @@ function App() {
               captureFile={captureFile}
               uploadFile={uploadFile}
             />
-          {(files.length !== 0) ? <Table files={files} /> : <span></span>}
+          {(files.length !== 0) ? 
+          <Suspense fallback={<></>}>
+            <Table files={files} />
+          </Suspense> 
+          : <span></span>}
           </>
       }
     </div>
