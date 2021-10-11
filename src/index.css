@@ -18,6 +18,9 @@ html.dark {
     background-color: #111111;
 }
 
+.nav-log {
+    background-size: 400%;
+}
 
 ::-webkit-scrollbar{
     width: 10px;

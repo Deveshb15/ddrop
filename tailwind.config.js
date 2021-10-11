@@ -10,6 +10,19 @@ module.exports = {
         'light-blue' : '#818CF8',
         'blue-opaque' : '#101629',
         'purple-light' : '#6406CD'
+      }, 
+      animation: {
+        'gradient-anim': 'gradient-anim 1s infinite alternate'
+      },
+      keyframes: {
+        'gradient-anim': {
+          '0%': {
+            'background-position': 'left'
+          },
+          '100%': {
+            'background-position': 'right'
+          }
+        }
       }
     },
   },

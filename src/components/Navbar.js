@@ -15,7 +15,7 @@ const Navbar = (props) => {
                 </div>
               </div>
               <div>
-                <h1 className="font-extrabold text-6xl mt-8 p-4 ml-24 text-transparent bg-clip-text bg-gradient-to-br from-indigo-400 to-green-400">DDrop</h1>
+                <h1 className="font-extrabold text-6xl mt-8 p-4 ml-24 text-transparent bg-clip-text bg-gradient-to-br from-indigo-400 to-green-400 nav-log animate-gradient-anim">DDrop</h1>
               </div>
               <div className="flex">
                 { props.account
@@ -41,7 +41,7 @@ const Navbar = (props) => {
                       </small>
                     </div>
                 }
-                <div className="m-2">
+                <div className="m-2 ml-4">
                   <Toggle />
                 </div>
               </div>

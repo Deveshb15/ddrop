@@ -18,7 +18,7 @@ const Main = (props) => {
         <div className="p-1 bg-gradient-to-tr from-light-violet to-light-blue rounded-sm">
           <div className="shadow-xl drop-shadow border border-transparent rounded dark:border-gray-800 bg-blue-50 dark:bg-blue-opaque" style={{width: '28rem'}}>
             <div className="px-4 py-5 sm:px-6">
-              <h1 className="text-2xl text-center leading-6 text-blue-700 dark:text-purple-light font-extrabold">
+              <h1 className="text-2xl text-center leading-6 text-blue-700 dark:text-purple-400 font-extrabold">
                 Share File
               </h1>
             </div>
