@@ -37,7 +37,7 @@ const Navbar = (props) => {
                   </div>
                   : <div className="flex">
                       <small className="mr-2 mt-2 underline" id="account">
-                        <button onClick={() => props.connect()} type="submit" className="py-2 px-4 bg-white text-blue-700 border border-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 hover:border-transparent hover:bg-blue-500 hover:text-white transform transition hover:scale-110 rounded"><b>Connet Wallet</b></button>
+                        <button onClick={() => props.connect()} type="submit" className="py-2 px-4 bg-white text-blue-700 border border-blue-500 dark:bg-gray-700 dark:text-gray-100 dark:border-gray-600 hover:border-transparent hover:bg-blue-500 hover:text-white transform transition hover:scale-110 rounded"><b>Connect Wallet</b></button>
                       </small>
                     </div>
                 }
